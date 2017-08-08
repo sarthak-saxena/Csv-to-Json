@@ -1,12 +1,13 @@
-var csvToJsonData
 function CSVToArray( strData, strDelimiter ){
     strDelimiter = (strDelimiter || ",");
     var objPattern = new RegExp(
         (
             // Delimiters.
             "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
             // Quoted fields.
             "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
             // Standard fields.
             "([^\"\\" + strDelimiter + "\\r\\n]*))"
         ),
@@ -24,12 +25,14 @@ function CSVToArray( strData, strDelimiter ){
             headersFound = true;
             headerIndex = 0;
         }
+
         var strMatchedValue;
         if (arrMatches[ 2 ]){
             strMatchedValue = arrMatches[ 2 ].replace(new RegExp( "\"\"", "g" ),"\"");
         } else {
             strMatchedValue = arrMatches[ 3 ];
         }
+
         if (!headersFound) {
           headers.push(strMatchedValue);
         } else {
@@ -39,15 +42,17 @@ function CSVToArray( strData, strDelimiter ){
     }
     return( arrData );
 }
-function getCsvText(url){
+
+function getDataFromCsv(url){
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
+
     request.send(null);
     request.onreadystatechange = function () {
         if (request.readyState === 4 && request.status === 200) {
-                console.log(request.responseText)
-                csvToJsonData =  CSVToArray(request.responseText);
+                return CSVToArray(request.responseText);
         }
     }
 }
-getCsvText('https://adcreation-m.s3-ap-south-1.amazonaws.com/1502185055_test.csv')
+
+var data = getDataFromCsv('https://adcreation-m.s3-ap-south-1.amazonaws.com/1502185055_test.csv')
